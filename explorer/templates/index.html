@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigate Tables with Pagination</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <h1>Displaying Filtered Tables</h1>
+
+    <!-- Search Form -->
+    <form method="get" action="/">
+        <input type="text" name="search" placeholder="Search by title or columns" value="{{ search_query }}">
+        <button type="submit">Search</button>
+    </form>
+
+    <div class="pagination">
+        {% if table_set_page > 1 %}
+        <a href="/?table_set_page={{ table_set_page - 1 }}&search={{ search_query }}">Previous Tables</a>
+        {% endif %}
+
+        <span>Table Set Page {{ table_set_page }} of {{ total_table_sets }}</span>
+
+        {% if table_set_page < total_table_sets %} <a
+            href="/?table_set_page={{ table_set_page + 1 }}&search={{ search_query }}">Next Tables</a>
+            {% endif %}
+    </div>
+
+    <div id="tables">
+        {% for table_dict in table_set %}
+        {% for title, table in table_dict.items() %}
+        <h2>{{ title }}</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    {% for column in table.columns %}
+                    <th>{{ column }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for index, row in table.iterrows() %}
+                <tr>
+                    {% for cell in row %}
+                    <td>{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endfor %}
+        {% endfor %}
+    </div>
+</body>
+
+</html>

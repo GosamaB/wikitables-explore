@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schema Comparison with Pagination</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <h1>Schema Comparison Results</h1>
+
+    <!-- Search Form -->
+    <form method="get" action="/compare-schemas">
+        <input type="text" name="search" placeholder="Search by title" value="{{ search_query }}">
+        <button type="submit">Search</button>
+    </form>
+
+    <!-- Pagination Navigation -->
+    <div class="pagination">
+        {% if page > 1 %}
+        <a href="/compare-schemas?page={{ page - 1 }}&search={{ search_query }}">Previous</a>
+        {% endif %}
+
+        <span>Page {{ page }} of {{ total_pages }}</span>
+
+        {% if page < total_pages %} <a href="/compare-schemas?page={{ page + 1 }}&search={{ search_query }}">Next</a>
+            {% endif %}
+    </div>
+
+    <!-- Display comparison results -->
+    {% for result in comparison_results %}
+    <div class="result">
+        <h2>{{ result.title }}</h2>
+        <p>Accuracy: {{ result.accuracy }}%</p>
+
+        <h3>Comparison Table</h3>
+        {{ result.schema_sorted }}
+        {{ result.out_schema_sorted }}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Schema Columns</th>
+                    <th>Out Schema Columns</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Highlight matched columns -->
+                {% for column in result.matched_columns %}
+                <tr class="highlight">
+                    <td>{{ column[0] }}</td>
+                    <td>{{ column[1] }}</td>
+                </tr>
+                {% endfor %}
+
+                <!-- Unmatched columns in schema -->
+                {% for column in result.unmatched_in_schema %}
+                <tr>
+                    <td>{{ column }}</td>
+                    <td></td>
+                </tr>
+                {% endfor %}
+
+                <!-- Unmatched columns in out_schema -->
+                {% for column in result.unmatched_in_out_schema %}
+                <tr>
+                    <td></td>
+                    <td>{{ column }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <hr>
+    {% endfor %}
+</body>
+
+</html>
